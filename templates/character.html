@@ -2,10 +2,36 @@
 
 {% block content %}
     <div class="char-details">
-        <h1>{{ character.name }}</h1>
-        <p>Status: {{ character.status }}</p>
-        <p>Species: {{ character.species }}</p>
-        <p>Gender: {{ character.gender }}</p>
+
         <img src="{{ character.image }}" alt="{{ character.name }}">
+        <div class="details-text">
+            <h1>{{ character.name }}</h1>
+            <p>Status: {{ character.status }}</p>
+            <p>Species: {{ character.species }}</p>
+            <p>Gender: {{ character.gender }}</p>
+            <p>Origin: {{ character.origin }}</p>
+            <p>Location: {{ character.location }}</p>
+        </div>
+
+        <div class="residents">
+            <h2>Residents in {{ character.location }}</h2>
+            <div class="resident-cards">
+                {% for resident in character.residents %}
+                    <div class="card">
+                        <a href="/character/{{ resident.id }}">
+                            <div class="card-inner">
+                                <div class="card-front">
+                                    <img class="card-image" src="{{ resident.image }}" alt="{{ resident.name }}">
+                                </div>
+                                <div class="card-back">
+                                    <p>{{ resident.name }}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
     </div>
 {% endblock %}

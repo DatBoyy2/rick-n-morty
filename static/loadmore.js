@@ -11,17 +11,20 @@
                                 var card = document.createElement('div');
                                 card.className = 'card';
                                 card.innerHTML = `
-                                    <div class="card-inner">
-                                        <div class="card-front">
-                                            <img class="card-image" src="${character.image}" alt="${character.name}">
+
+                                    <a href="/character/${character.id}">
+                                        <div class="card-inner">
+                                            <div class="card-front">
+                                                <img class="card-image" src="${character.image}" alt="${character.name}">
+                                            </div>
+                                            <div class="card-back">
+                                                <p>${character.name}</p>
+                                                <p>Status: ${character.status}</p>
+                                                <p>Species: ${character.species}</p>
+                                                <p>Gender: ${character.gender}</p>
+                                            </div>
                                         </div>
-                                        <div class="card-back">
-                                            <p>${character.name}</p>
-                                            <p>Status: ${character.status}</p>
-                                            <p>Species: ${character.species}</p>
-                                            <p>Gender: ${character.gender}</p>
-                                        </div>
-                                    </div>
+                                    </a>
                                 `;
                                 cardContainer.appendChild(card);
                             });

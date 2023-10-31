@@ -1,39 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-
-    <div class="sidebar">
-        <!-- Contenido de la barra de menú -->
+    <div class="welcome-page">
+        <h1>Welcome to the Rick and Morty API</h1>
     </div>
-
-    <div class="char">
-
-        <h1>Personajes</h1>
-        <div class="card-container">
-            {% for character in characterlist %}
-                <div class="card">
-                    <a href="/character/{{ character.id }}">
-
-                        <div class="card-inner">
-                            <div class="card-front">
-                                <img class="card-image" src="{{ character.image }}" alt="{{ character.name }}">
-                            </div>
-                            <div class="card-back">
-                                <p>{{ character.name }}</p>
-                                <p>Status: {{ character.status }}</p>
-                                <p>Species: {{ character.species }}</p>
-                                <p>Gender: {{ character.gender }}</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            {% endfor %}
-
-        </div>
-            <button id="load-more-button">Cargar más personajes</button>
-
-    <script src="{{ url_for('static', filename='loadmore.js') }}"></script>
-
-    </div>
-
-{% endblock content %}
+{% endblock %}

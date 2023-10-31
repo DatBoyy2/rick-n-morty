@@ -4,31 +4,34 @@ body {
 }
 
 .header {
-            background-image: url('URL_DE_LA_IMAGEN_DEL_LOGO');
-            background-size: contain;
-            background-position: top right;
-            height: 80px;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-        }
+    height: 80px;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    background-color: black; /* Fondo del header */
+    z-index: 1; /* Asegura que el header esté en la capa superior */
+}
 
-        .logo {
-            width: 80px; /* Ajusta el tamaño del logo según tus necesidades */
-        }
+.logo {
+    position: fixed;
+    top: 0;
+    right: 0;
+    margin: 20px; /* Ajusta el margen según tus necesidades */
+}
 
-        .title {
-            font-size: 24px; /* Tamaño del título */
-        }
+.logo img {
+    width: 50px; /* Ajusta el tamaño del logo según tus necesidades */
+    height: auto; /* Mantiene la proporción de aspecto */
+}
 
-        .content {
-            margin-top: 80px; /* Asegura que el contenido no se oculte detrás del encabezado */
-            padding: 20px;
-        }
+.content {
+    margin-top: 80px; /* Asegura que el contenido no se oculte detrás del encabezado */
+    padding: 20px;
+}
 
     /* content */
 
@@ -93,12 +96,30 @@ body {
 }
 
 .sidebar {
-    height: 100vh; /* Toma el 100% de la altura de la ventana */
-    width: 100px; /* Ancho de la barra lateral */
-    background-color: #064215; /* Color verde para la barra de menú */
-    position: fixed; /* Fija la barra lateral en su posición */
-    left: 0; /* Posición a la izquierda de la página */
-    top: 0; /* Posición en la parte superior de la página */
+    height: 100vh;
+    width: 100px;
+    background-color: #064215;
+    position: fixed;
+    left: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2;
+}
+
+.sidebar a {
+
+    margin-top: 20px; /* Ajusta el margen superior según sea necesario */
+
+}
+
+.sidebar a img{
+
+    width: 50px;
+    height: auto;
+    padding-top: 20%;
+
 }
 
 /* Estilos para la parte trasera de las cartas */
@@ -124,8 +145,112 @@ body {
   margin-top: 1vw;
   height: 3vw;
   width: 12vw;
+  margin-bottom: 60px;
 }
 
 #load-more-button:hover {
     background-color: #45a049; /* Cambiar el color de fondo al pasar el ratón */
+    margin-bottom: 60px;
+}
+
+/*charachter page */
+
+.char-details {
+    display: flex;
+    align-items: center;
+    margin: 20px;
+
+}
+
+
+.char-details h1 {
+    font-size: 50px;
+    color: white;
+}
+
+.char-details img {
+    width: 500px; /* Ajusta el ancho de la imagen según tus necesidades */
+    height: auto;
+    border-radius: 10px; /* Para bordes redondeados */
+    margin-left: 10%;
+    position: relative;
+}
+
+.details-text {
+
+    color: white;
+    display: block;
+    position: relative;
+    margin-left: 10%;
+
+}
+
+.details-text p{
+
+    font-size: 24px;
+
+}
+
+/*footer*/
+
+.footer {
+    background-color: #333; /* Color de fondo del footer */
+    color: white; /* Color del texto */
+    text-align: center; /* Centra el contenido del footer */
+    padding: 20px 0; /* Espaciado interno del footer */
+    position: fixed; /* Fija el footer en la parte inferior de la ventana */
+    width: 100%; /* Ancho completo del footer */
+    bottom: 0; /* Coloca el footer en la parte inferior */
+    z-index: 1;
+}
+
+.social-icons{
+
+   padding-left: 6%;
+
+}
+
+.social-icons img {
+    width: 30px; /* Tamaño de los iconos */
+    margin: 0 10px; /* Espaciado entre los iconos */
+
+}
+
+/* home */
+
+.welcome-page {
+    height: 80vh; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: url('https://media.tenor.com/BgR83Df82t0AAAAi/portal-rick-and-morty.gif') no-repeat center center/cover;
+   
+}
+
+/* Establecer estilos para el texto del título */
+.welcome-page h1 {
+    font-size: 36px;
+    color: white;
+    text-align: center;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+
+/* character resident card*/
+
+.resident-cards {
+    display: flex;
+    flex-wrap: nowrap; /* Asegura que las tarjetas no se envuelvan a la siguiente línea */
+    overflow-x: auto; /* Agrega una barra de desplazamiento horizontal si las tarjetas no caben en la pantalla */
+    margin-top: 20px;
+}
+
+.resident-cards .card {
+    width: 150px; /* Tamaño de las tarjetas de los residentes */
+    height: 220px; /* Altura de las tarjetas de los residentes */
+    margin-right: 10px; /* Espacio entre las tarjetas */
+}
+
+.resident-cards .card .card-image {
+    height: 100%; /* Asegura que la imagen ocupe toda la altura de la tarjeta */
 }

@@ -12,6 +12,13 @@ character_url=url+"character/"
 location_url=url+"location/"
 episode_url=url+"episode/"
 
+
+#home
+
+@app.route('/')
+def home():
+    return render_template('home.html')
+
 #Generar id random
 charIDlist = []
 cont1 = 0
@@ -38,8 +45,9 @@ def FrontPageFristTwentyCharactersUpdatedInformation():
             species = str(page[while_count]['species'])
             gender = str(page[while_count]['gender'])
             image = str(page[while_count]['image'])
+            id = str(page[while_count]['id'])
 
-            character = {"id": i, "name": name, "status": status, "species": species,
+            character = {"id": id, "name": name, "status": status, "species": species,
                              "gender": gender, "image": image}
             characterlist.append(character)  # Agregar el character al characterlist
 
@@ -89,9 +97,9 @@ characterlist = FrontPageFristTwentyCharactersUpdatedInformation()
 scheduler.add_job(id='Get Updated Info', func=FrontPageFristTwentyCharactersUpdatedInformation, trigger="interval", seconds=55)
 scheduler.start()
 
-@app.route('/')
+@app.route('/all-characters')
 def get_Char():
-    return(render_template('home.html', characterlist=characterlist))
+    return(render_template('charlist.html', characterlist=characterlist))
 
 @app.route('/load-more-characters')
 def load_more_characters():
@@ -108,9 +116,34 @@ def show_character(character_id):
         species = str(page['species'])
         gender = str(page['gender'])
         image = str(page['image'])
+        
+        origin_url = page['origin']['url']
+        origin_data = requests.get(origin_url).json()
+        origin_name = origin_data['name']
+
+        location_url = page['location']['url']
+        location_data = requests.get(location_url).json()
+        location_name = location_data['name']
+        
+        residents_urls = location_data['residents'][:5]  # Obtén las URLs de los primeros 5 residentes
+        residents = []
+
+        for resident_url in residents_urls:
+            resident_data = requests.get(resident_url).json()
+            residents.append({
+                "name": resident_data['name'],
+                "image": resident_data['image']
+            })
 
         character_info = {
-            "name": name, "status": status, "species": species, "gender": gender, "image": image
+            "name": name,
+            "status": status,
+            "species": species,
+            "gender": gender,
+            "image": image,
+            "origin": origin_name,
+            "location": location_name,
+            "residents": residents
         }
 
     except Exception as e:
@@ -118,7 +151,6 @@ def show_character(character_id):
         character_info = None  # Maneja el error apropiadamente
 
     return render_template('character.html', character=character_info)
-
 
 if __name__ == '__main__':
     app.run(debug=True)
