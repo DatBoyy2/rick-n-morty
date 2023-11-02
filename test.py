@@ -141,36 +141,11 @@ def show_character(character_id):
 
     return render_template('character.html', character=character_info)
 
+
 @app.route('/location/<path:location_url>')
 def get_location_chars(location_url):
-    page = requests.get(location_url).json()
-    
     try:
-
-        residents_urls = json.loads(page['residents'])
-        residents = []
-        
-        for resident_url in residents_urls:
-            resident_data = requests.get(resident_url).json()
-            
-            residents.append({
-                "name": resident_data['name'],
-                "image": resident_data['image'],
-                "status": resident_data['status'],
-                "species": resident_data['species'],
-                "gender": resident_data['gender']
-            })
-
-    except Exception as e:
-        print(f"Error: {e}")
-        residents = None  # Maneja el error apropiadamente
-
-    return render_template('location.html', location_url=location_url, residents=residents)
-
-@app.route('/origin/<path:origin_url>')
-def get_origin_chars(origin_url):
-    try:
-        page = requests.get(origin_url).json()
+        page = requests.get(location_url).json()
         origin_name = page['name']  # Obtenemos el nombre de la ubicación
         residents_urls = page['residents']
 
@@ -185,7 +160,58 @@ def get_origin_chars(origin_url):
         print(f"Error: {e}")
         residents = []  # En caso de error, devuelve una lista vacía
 
-    return render_template('location.html', location_url=origin_url, characters=residents)
+    return render_template('location.html', location_url=location_url, characters=residents)
+
+
+
+def get_all_characters_from_origin(usr_origin_url):
+    page = requests.get("https://rickandmortyapi.com/api/location/{}".format(str(usr_origin_url))).json()
+    originslist = []
+    url_format_characters = "https://rickandmortyapi.com/api/character/"
+    for __ in range(0, 60000):
+        try:
+            residents_value = str(page['residents'][__])
+            originslist.append(residents_value)
+        except:
+            break
+
+    for _ in originslist:
+        match = re.search(r'/(\d+)$', str(_))
+
+        if match:
+            character_number = int(match.group(1))
+            url_format_characters += str(character_number) + ","
+
+    characterlist = []
+    page = requests.get(url_format_characters).json()
+    while_count = 0
+    while True:
+        try:
+            name = str(page[while_count]['name'])
+            status = str(page[while_count]['status'])
+            species = str(page[while_count]['species'])
+            gender = str(page[while_count]['gender'])
+            image = str(page[while_count]['image'])
+            id = str(page[while_count]['id'])
+
+            character = {"id": id, "name": name, "status": status, "species": species,
+                             "gender": gender, "image": image}
+            characterlist.append(character)
+
+            while_count += 1
+        except:break
+    return characterlist
+
+
+
+
+
+@app.route('/origin/<int:location_id>')
+def get_origin_chars(location_id):
+    print(location_id)
+    characters_list_from_some_origen = get_all_characters_from_origin(location_id)
+
+    return render_template('location.html', location_url=location_id, characters=characters_list_from_some_origen)
 
 
 

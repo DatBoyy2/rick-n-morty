@@ -18,7 +18,6 @@
                             <p>Status: {{ character['status'] }}</p>
                             <p>Species: {{ character['species'] }}</p>
                             <p>Gender: {{ character['gender'] }}</p>
-                            <p>Origin: {{ character['origin_name'] }}</p>  <!-- Mostramos el nombre del origen -->
                         </div>
                     </div>
                 </a>
@@ -26,9 +25,6 @@
         {% endfor %}
 
     </div>
-    <button id="load-more-button">Cargar más personajes</button>
-
-    <script src="{{ url_for('static', filename='loadmore.js') }}"></script>
 
 </div>
 
