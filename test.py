@@ -2,6 +2,7 @@ import requests
 import random
 from flask import Flask, render_template, jsonify, request
 from flask_apscheduler import APScheduler
+import json
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 scheduler = APScheduler()
@@ -116,24 +117,11 @@ def show_character(character_id):
         species = str(page['species'])
         gender = str(page['gender'])
         image = str(page['image'])
-        
-        origin_url = page['origin']['url']
-        origin_data = requests.get(origin_url).json()
-        origin_name = origin_data['name']
-
-        location_url = page['location']['url']
-        location_data = requests.get(location_url).json()
-        location_name = location_data['name']
-        
-        residents_urls = location_data['residents'][:5]  # Obtén las URLs de los primeros 5 residentes
-        residents = []
-
-        for resident_url in residents_urls:
-            resident_data = requests.get(resident_url).json()
-            residents.append({
-                "name": resident_data['name'],
-                "image": resident_data['image']
-            })
+        origin = str(page['origin']['name'])
+        origin_url = str(page['origin']['url'])
+        location = str(page['location']['name'])
+        location_url = str(page['location']['url'])
+    
 
         character_info = {
             "name": name,
@@ -141,9 +129,10 @@ def show_character(character_id):
             "species": species,
             "gender": gender,
             "image": image,
-            "origin": origin_name,
-            "location": location_name,
-            "residents": residents
+            "origin": origin,
+            "location": location,
+            "location_url": location_url,
+            "origin_url": origin_url
         }
 
     except Exception as e:
@@ -151,6 +140,54 @@ def show_character(character_id):
         character_info = None  # Maneja el error apropiadamente
 
     return render_template('character.html', character=character_info)
+
+@app.route('/location/<path:location_url>')
+def get_location_chars(location_url):
+    page = requests.get(location_url).json()
+    
+    try:
+
+        residents_urls = json.loads(page['residents'])
+        residents = []
+        
+        for resident_url in residents_urls:
+            resident_data = requests.get(resident_url).json()
+            
+            residents.append({
+                "name": resident_data['name'],
+                "image": resident_data['image'],
+                "status": resident_data['status'],
+                "species": resident_data['species'],
+                "gender": resident_data['gender']
+            })
+
+    except Exception as e:
+        print(f"Error: {e}")
+        residents = None  # Maneja el error apropiadamente
+
+    return render_template('location.html', location_url=location_url, residents=residents)
+
+@app.route('/origin/<path:origin_url>')
+def get_origin_chars(origin_url):
+    try:
+        page = requests.get(origin_url).json()
+        origin_name = page['name']  # Obtenemos el nombre de la ubicación
+        residents_urls = page['residents']
+
+        residents = []
+        for resident_url in residents_urls:
+            resident_data = requests.get(resident_url).json()
+            # Agregamos el nombre de la ubicación a los datos de cada residente
+            resident_data['origin_name'] = origin_name
+            residents.append(resident_data)
+
+    except Exception as e:
+        print(f"Error: {e}")
+        residents = []  # En caso de error, devuelve una lista vacía
+
+    return render_template('location.html', location_url=origin_url, characters=residents)
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

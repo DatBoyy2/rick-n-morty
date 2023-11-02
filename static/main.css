@@ -236,21 +236,3 @@ body {
 }
 
 
-/* character resident card*/
-
-.resident-cards {
-    display: flex;
-    flex-wrap: nowrap; /* Asegura que las tarjetas no se envuelvan a la siguiente línea */
-    overflow-x: auto; /* Agrega una barra de desplazamiento horizontal si las tarjetas no caben en la pantalla */
-    margin-top: 20px;
-}
-
-.resident-cards .card {
-    width: 150px; /* Tamaño de las tarjetas de los residentes */
-    height: 220px; /* Altura de las tarjetas de los residentes */
-    margin-right: 10px; /* Espacio entre las tarjetas */
-}
-
-.resident-cards .card .card-image {
-    height: 100%; /* Asegura que la imagen ocupe toda la altura de la tarjeta */
-}
