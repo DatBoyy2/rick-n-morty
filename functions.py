@@ -3,6 +3,7 @@ import random
 from flask import Flask, render_template, jsonify, request
 from flask_apscheduler import APScheduler
 import json
+import re
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 scheduler = APScheduler()
@@ -29,10 +30,13 @@ while cont1 < 20:
         charIDlist.append(id)
         cont1 += 1
 
-def FrontPageFristTwentyCharactersUpdatedInformation():
-    #Get Updated Data From Api
+
+#Character related functions
+
+def FristTwentyCharactersUpdatedInformation():
+    
     print("Obteniendo datos actualizados")
-    characterlist = []  # Inicializar characterlist dentro de la función get_Char()
+    characterlist = [] 
     url_format_api_request = ""
     for i in charIDlist:
         url_format_api_request += str(i) + ","
@@ -48,9 +52,8 @@ def FrontPageFristTwentyCharactersUpdatedInformation():
             image = str(page[while_count]['image'])
             id = str(page[while_count]['id'])
 
-            character = {"id": id, "name": name, "status": status, "species": species,
-                             "gender": gender, "image": image}
-            characterlist.append(character)  # Agregar el character al characterlist
+            character = {"id": id, "name": name, "status": status, "species": species, "gender": gender, "image": image}
+            characterlist.append(character)  
 
             while_count+= 1
         except:
@@ -94,8 +97,8 @@ def RequestApiCharacterInformation(CharactersLoadInt):
 
 
 #Crontab Update Data Every 5 Seconds
-characterlist = FrontPageFristTwentyCharactersUpdatedInformation()
-scheduler.add_job(id='Get Updated Info', func=FrontPageFristTwentyCharactersUpdatedInformation, trigger="interval", seconds=55)
+characterlist = FristTwentyCharactersUpdatedInformation()
+scheduler.add_job(id='Get Updated Info', func=FristTwentyCharactersUpdatedInformation, trigger="interval", seconds=55)
 scheduler.start()
 
 @app.route('/all-characters')
@@ -121,7 +124,22 @@ def show_character(character_id):
         origin_url = str(page['origin']['url'])
         location = str(page['location']['name'])
         location_url = str(page['location']['url'])
-    
+
+        pattern = r'/(\d+)$'
+
+        match = re.search(pattern, origin_url)
+        
+        origen_number = None  
+
+        match = re.search(pattern, origin_url)
+
+        if match:
+            origen_number = match.group(1)
+
+        match = re.search(pattern, location_url)
+
+        if match:
+            location_number = match.group(1)
 
         character_info = {
             "name": name,
@@ -132,7 +150,9 @@ def show_character(character_id):
             "origin": origin,
             "location": location,
             "location_url": location_url,
-            "origin_url": origin_url
+            "origin_url": origin_url,
+            "origen_id" : origen_number,
+            "location_id": location_number,
         }
 
     except Exception as e:
@@ -142,26 +162,45 @@ def show_character(character_id):
     return render_template('character.html', character=character_info)
 
 
-@app.route('/location/<path:location_url>')
-def get_location_chars(location_url):
-    try:
-        page = requests.get(location_url).json()
-        origin_name = page['name']  # Obtenemos el nombre de la ubicación
-        residents_urls = page['residents']
 
-        residents = []
-        for resident_url in residents_urls:
-            resident_data = requests.get(resident_url).json()
-            # Agregamos el nombre de la ubicación a los datos de cada residente
-            resident_data['origin_name'] = origin_name
-            residents.append(resident_data)
+#origin/Location functions
 
-    except Exception as e:
-        print(f"Error: {e}")
-        residents = []  # En caso de error, devuelve una lista vacía
+def get_all_characters_from_origin(usr_location_url):
+    page = requests.get("https://rickandmortyapi.com/api/location/{}".format(str(usr_location_url))).json()
+    originslist = []
+    url_format_characters = "https://rickandmortyapi.com/api/character/"
+    for __ in range(0, 60000):
+        try:
+            residents_value = str(page['residents'][__])
+            originslist.append(residents_value)
+        except:
+            break
 
-    return render_template('location.html', location_url=location_url, characters=residents)
+    for _ in originslist:
+        match = re.search(r'/(\d+)$', str(_))
 
+        if match:
+            character_number = int(match.group(1))
+            url_format_characters += str(character_number) + ","
+
+    characterlist = []
+    page = requests.get(url_format_characters).json()
+    while_count = 0
+    while True:
+        try:
+            name = str(page[while_count]['name'])
+            status = str(page[while_count]['status'])
+            species = str(page[while_count]['species'])
+            gender = str(page[while_count]['gender'])
+            image = str(page[while_count]['image'])
+            id = str(page[while_count]['id'])
+
+            character = {"id": id, "name": name, "status": status, "species": species, "gender": gender, "image": image}
+            characterlist.append(character)
+
+            while_count += 1
+        except:break
+    return characterlist
 
 
 def get_all_characters_from_origin(usr_origin_url):
@@ -194,8 +233,7 @@ def get_all_characters_from_origin(usr_origin_url):
             image = str(page[while_count]['image'])
             id = str(page[while_count]['id'])
 
-            character = {"id": id, "name": name, "status": status, "species": species,
-                             "gender": gender, "image": image}
+            character = {"id": id, "name": name, "status": status, "species": species, "gender": gender, "image": image}
             characterlist.append(character)
 
             while_count += 1
@@ -203,7 +241,11 @@ def get_all_characters_from_origin(usr_origin_url):
     return characterlist
 
 
+@app.route('/location/<int:location_id>')
+def get_location_chars(location_id):
+    characters_list_from_some_origen = get_all_characters_from_origin(location_id)
 
+    return render_template('location.html', location_url=location_id, characters=characters_list_from_some_origen)
 
 
 @app.route('/origin/<int:location_id>')
@@ -212,6 +254,47 @@ def get_origin_chars(location_id):
     characters_list_from_some_origen = get_all_characters_from_origin(location_id)
 
     return render_template('location.html', location_url=location_id, characters=characters_list_from_some_origen)
+
+
+@app.route('/all-locations')
+def get_all_locations():
+    locations = requests.get(location_url).json()['results']
+    return render_template('locations-list.html', locations=locations)
+
+
+#Episodes related functions
+
+@app.route('/all-episodes')
+def get_all_episodes():
+    episodes = requests.get(episode_url).json()['results']
+    return render_template('episodes-list.html', episodes=episodes)
+
+
+def get_characters_from_episode(episode_url):
+    episode_data = requests.get(episode_url).json()
+    characters_urls = episode_data['characters']
+    character_list = []
+
+    for character_url in characters_urls:
+        character_data = requests.get(character_url).json()
+        character_info = {
+            "id": character_data['id'],
+            "name": character_data['name'],
+            "status": character_data['status'],
+            "species": character_data['species'],
+            "gender": character_data['gender'],
+            "image": character_data['image']
+        }
+        character_list.append(character_info)
+
+    return character_list
+
+
+@app.route('/episode/<int:episode_id>')
+def get_episode_characters(episode_id):
+    episode_url = f"https://rickandmortyapi.com/api/episode/{episode_id}"
+    characters_list = get_characters_from_episode(episode_url)
+    return render_template('episode-char.html', characters=characters_list)
 
 
 

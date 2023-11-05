@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <h1 class="list-page-title">Locations</h1>
+    <ul>
+        {% for location in locations %}
+            <li class="list-page-list">
+                <ul>
+                    <a href="/location/{{ location.id }}">
+                        {{ location.name }}
+                    </a>
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <h1 class="list-page-title">Episodes</h1>
+    <ul>
+        {% for episode in episodes %}
+            <li class="list-page-list">
+                <ul>
+                    <a href="/episode/{{ episode.id }}">
+                        {{ episode.name }}
+                    </a>
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
